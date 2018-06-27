@@ -22,7 +22,7 @@ static INT delta = 0;
 static BOOL beep;
 static FLOAT zoom = 0;
 static FLOAT zoomMin = 1000.0f;
-static FLOAT zoomMax = 2250.0f + WHEEL_DELTA * 30;
+static FLOAT zoomMax = 2250.0f + WHEEL_DELTA * 80;
 enum {
     STATUS_FIND,
     STATUS_SCAN,
@@ -215,7 +215,7 @@ BOOL IsZoomValue(FLOAT value) {
     static INT zoomRate = (2250 - 1000) / WHEEL_DELTA;
     for (INT i = 1; i <= zoomRate; ++i) {
         FLOAT u = 1000.0f + WHEEL_DELTA * i;
-        FLOAT d = 2250.0f - WHEEL_DELTA * i;
+        FLOAT d = 2250.0f - WHEEL_DELTA * (11 - i);
         if (value <= u && value >= d) return TRUE;
     }
     return FALSE;
