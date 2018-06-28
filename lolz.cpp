@@ -47,6 +47,9 @@ DWORD WINAPI CommandsThread(LPVOID);
 VOID UpdateText();
 
 int main() {
+    static SYSTEM_INFO sysinfo;
+    GetSystemInfo(&sysinfo);
+
     static WNDCLASS hookerClass;
     memset(&hookerClass, 0, sizeof(hookerClass));
     hookerClass.hInstance = GetModuleHandle(NULL);
@@ -63,7 +66,7 @@ int main() {
     RawInputDevice.hwndTarget = hooker; 
     if (!RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTHEADER))) printf("%d\n", GetLastError());
 
-    HANDLE cmdthr = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) CommandsThread, NULL, 0, NULL);
+    static HANDLE cmdthr = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) CommandsThread, NULL, 0, NULL);
 
     while (run) {
         list.clear();
@@ -85,7 +88,7 @@ int main() {
 
         {
             vector<BYTE> chunk;
-            for (SIZE_T address = 0x00000000; address < 0x7fffffff;) {
+            for (SIZE_T address = (SIZE_T) sysinfo.lpMinimumApplicationAddress; address < (SIZE_T) sysinfo.lpMaximumApplicationAddress;) {
                 MEMORY_BASIC_INFORMATION info;
                 if (VirtualQueryEx(process, (LPCVOID) address, &info, sizeof(info)) != sizeof(info) || info.RegionSize > 0x7fffffff) break;
                 if (info.Protect == PAGE_READWRITE && info.State == MEM_COMMIT) {
@@ -263,5 +266,5 @@ VOID UpdateText() {
     puts("Author:\n Dresmor Alakazard");
     puts("");
     printf("Command: ");
-    textUpdating = false;
+    textUpdating = FALSE;
 }
